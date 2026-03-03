@@ -2,7 +2,6 @@ import socket
 
 serverIP = "127.0.0.1"
 serverPort = 9008
-msg = "żółta gęś"
 
 msg3_bytes = (300).to_bytes(4, byteorder='little')
 

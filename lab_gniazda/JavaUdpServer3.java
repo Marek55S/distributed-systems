@@ -16,12 +16,11 @@ public class JavaUdpServer3 {
             byte[] receiveBuffer = new byte[4];
 
             while(true) {
-                Arrays.fill(receiveBuffer, (byte)0);
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 socket.receive(receivePacket);
-                String msg = new String(receivePacket.getData());
-                int nb = ByteBuffer.wrap(receiveBuffer).getInt();
+                int nb = Integer.reverseBytes(ByteBuffer.wrap(receiveBuffer).getInt());
                 nb++;
+                nb = Integer.reverseBytes(nb);
                 byte[] buff = ByteBuffer.allocate(4).putInt(nb).array();
 
                 DatagramPacket sendPacket = new DatagramPacket(buff, buff.length, receivePacket.getAddress(), receivePacket.getPort());
