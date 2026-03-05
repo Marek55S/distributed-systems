@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Server {
     private final ConcurrentHashMap clientsMap = new ConcurrentHashMap<>();
 
-    private int clientNumber = 0;
+    private int clientId = 0;
 
-    public int getNewClientNumber(){
-        return clientNumber++;
+    public int getNewclientId(){
+        return clientId++;
     }
 
     public ServerMain() throws IOException{
@@ -20,17 +20,35 @@ public class Server {
 
             while(true){
                 Socket clientSocket = serverSocket.accept();
+                addNewClient(clientSocket);
             }
 
-        } catch
+        } catch (IOException e){
+            System.out.println("Error in server: " + e.getMessage());
+        }
     }
 
+    private void addNewClient(Socket clientSocket) {
+        int clientId = getNewclientId();
+        System.out.println("New client connected: " + clientId);
+        ServerThread clientThread = new ServerThread(clientSocket, this, clientId);
+        clientsMap.put(clientId, clientThread);
+    }
 
+    private void removeClient(int clientId) {
+        clientsMap.remove(clientId);
+    }
+    
+    private void broadcastMessage(String message, int senderId){
+        for (Object clientThread : clientsMap.values()){
+
+        }
+    }
 
 
     public static void main(String[] args){
         try{
-            new ServerMain();
+            new Server();
         }
         catch (IOException e){
             System.out.println("Error starting server: " + e.getMessage());
