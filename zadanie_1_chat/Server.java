@@ -12,7 +12,6 @@ public class Server {
 
 
     public Server(){
-
     }
 
     private void startServer(int portNumber) throws IOException {
@@ -38,6 +37,11 @@ public class Server {
             new Thread(clientThread).start();
         } catch (IOException e) {
             System.out.println("Error adding client " + clientId + ": " + e.getMessage());
+            try {
+                if (!clientSocket.isClosed()) clientSocket.close();
+            } catch (IOException ex) {
+                System.out.println("Error closing broken socket: " + ex.getMessage());
+            }
         }
     }
 
