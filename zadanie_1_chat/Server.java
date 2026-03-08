@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
-    private final ConcurrentHashMap<Integer, ServerThread> clientsThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ServerTCPThread> clientsThreadMap = new ConcurrentHashMap<>();
 
     private final AtomicInteger clientIdGenerator = new AtomicInteger(1);
 
@@ -31,7 +31,7 @@ public class Server {
     private void addNewClient(Socket clientSocket) {
         int clientId = clientIdGenerator.getAndIncrement();
         try {
-            ServerThread clientThread = new ServerThread(clientSocket, this, clientId);
+            ServerTCPThread clientThread = new ServerTCPThread(clientSocket, this, clientId);
             clientsThreadMap.put(clientId, clientThread);
             System.out.println("New client connected: " + clientId);
             new Thread(clientThread).start();
@@ -49,12 +49,16 @@ public class Server {
         clientsThreadMap.remove(clientId);
     }
     
-    public void broadcastMessage(String message, Object senderId){
-        for(ServerThread clientThread : clientsThreadMap.values()){
+    public void broadcastTCPMessage(String message, Object senderId){
+        for(ServerTCPThread clientThread : clientsThreadMap.values()){
             if(clientThread.getClientId() != (int) senderId){
                 clientThread.sendMessage(message);
             }
         }
+    }
+
+    public void broadcastUDPMessage(String message, Object senderId){
+        // Implement UDP broadcasting logic here
     }
 
 

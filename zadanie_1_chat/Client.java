@@ -2,7 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
+
 
 
 public class Client {
@@ -11,8 +11,6 @@ public class Client {
     private final Socket socket;
     private final BufferedReader in;
     private final PrintWriter out;
-
-
 
     public Client(String serverAddress, int serverPort) throws IOException {
         this.socket = new Socket(serverAddress, serverPort);
@@ -45,7 +43,6 @@ public class Client {
         return in;
     }
 
-
     public static void main(String[] args){
         String serverAddress = "localhost";
         int serverPort = 12345;
@@ -57,6 +54,5 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }
-
     }
 }

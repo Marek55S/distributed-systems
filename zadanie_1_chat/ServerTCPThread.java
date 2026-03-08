@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ServerThread implements Runnable{
+public class ServerTCPThread implements Runnable{
     private final Socket clientSocket;
     private final Server server;
     private final int clientId;
@@ -12,7 +12,7 @@ public class ServerThread implements Runnable{
     private final BufferedReader in;
     private final PrintWriter out;
 
-    public ServerThread(Socket clientSocket, Server server, int clientId) throws IOException {
+    public ServerTCPThread(Socket clientSocket, Server server, int clientId) throws IOException {
         this.clientSocket = clientSocket;
         this.server = server;
         this.clientId = clientId;
@@ -30,7 +30,7 @@ public class ServerThread implements Runnable{
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Received from client " + clientId + ": " + message);
-                server.broadcastMessage("Client " + clientId + ": " + message, clientId);
+                server.broadcastTCPMessage("Client " + clientId + ": " + message, clientId);
             }
         } catch (IOException e) {
             System.out.println("Error in client " + clientId + ": " + e.getMessage());
