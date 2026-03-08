@@ -45,6 +45,10 @@ public class Server {
         }
     }
 
+    private void addUDPConnection(){
+        
+    }
+
     public void removeClient(int clientId) {
         clientsThreadMap.remove(clientId);
     }
@@ -52,7 +56,7 @@ public class Server {
     public void broadcastTCPMessage(String message, Object senderId){
         for(ServerTCPThread clientThread : clientsThreadMap.values()){
             if(clientThread.getClientId() != (int) senderId){
-                clientThread.sendMessage(message);
+                clientThread.sendTCPMessage(message);
             }
         }
     }

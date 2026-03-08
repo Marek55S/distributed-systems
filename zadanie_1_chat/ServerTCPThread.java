@@ -50,7 +50,7 @@ public class ServerTCPThread implements Runnable{
     }
 
 
-    public void sendMessage(String message) {
+    public void sendTCPMessage(String message) {
         out.println(message);
         if (out.checkError()) {
             System.out.println("Failed to send message to client " + clientId);

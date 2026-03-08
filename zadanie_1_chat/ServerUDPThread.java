@@ -9,6 +9,14 @@ public class ServerUDPThread implements Runnable{
 
     }
 
+    private secureUDPConnection(){
+
+    }
+
+    public void sendUDPMessage(String message){
+        // Implement UDP message sending logic here
+    }
+
     @Override
     public void run() {
 
