@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class ServerTCPThread implements Runnable{
@@ -12,12 +13,28 @@ public class ServerTCPThread implements Runnable{
     private final BufferedReader in;
     private final PrintWriter out;
 
+    private InetAddress udpAddress;
+    private int udpPort;
+
     public ServerTCPThread(Socket clientSocket, Server server, int clientId) throws IOException {
         this.clientSocket = clientSocket;
         this.server = server;
         this.clientId = clientId;
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+    }
+
+    public void setUdpConnectionDetails(InetAddress address, int port) {
+        this.udpAddress = address;
+        this.udpPort = port;
+    }
+
+    public InetAddress getUdpAddress() {
+        return udpAddress;
+    }
+
+    public int getUdpPort() {
+        return udpPort;
     }
 
     public int getClientId() {
