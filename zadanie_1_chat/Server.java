@@ -14,6 +14,10 @@ public class Server {
     }
 
     private void startServer(int portNumber) throws IOException {
+        UdpServerListener udpListener = new UdpServerListener(this, portNumber);
+        new Thread(udpListener).start();
+        System.out.println("UDP listener started on port " + portNumber);
+
         try (ServerSocket serverSocket = new ServerSocket(portNumber)){
             System.out.println("Server is running on port " + portNumber);
             while(true){
