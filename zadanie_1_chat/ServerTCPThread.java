@@ -22,6 +22,9 @@ public class ServerTCPThread implements Runnable{
         this.clientId = clientId;
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+    }
+
+    public void sendGreeting() {
         out.println("ID: " + clientId);
     }
 

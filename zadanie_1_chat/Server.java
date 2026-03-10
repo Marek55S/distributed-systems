@@ -44,6 +44,7 @@ public class Server {
     private void addTCPConnection(int clientId, Socket clientSocket) throws IOException{
         ServerTCPThread tcpThread = new ServerTCPThread(clientSocket, this, clientId);
         clientsMap.put(clientId, tcpThread);
+        tcpThread.sendGreeting();
         new Thread(tcpThread).start();
     }
 

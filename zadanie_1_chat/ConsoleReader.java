@@ -4,6 +4,29 @@ public class ConsoleReader implements Runnable{
     private final Client client;
     private final Scanner keyboardScanner;
 
+    public static final String asciiArtMessage = """
+            
+            
+                                  ;\\
+                                 _' \\_
+                               ,' '  '`.
+                              ;,)       \\
+                             /          :
+                             (_         :
+                              `--.       \\
+                                 /        `.
+                                ;           `.
+                               /              `.
+                              :                 `.
+                              :                   \\
+                               \\\\                \\
+                                ::                 :
+                                || |               |
+                                || |`._            ;
+                  Y            _;; ; __`._,       (________
+              (t^##_          ((__/(_____(______,'______(___) SSt
+            """;
+
     public ConsoleReader(Client client){
         this.client = client;
         this.keyboardScanner = new Scanner(System.in);
@@ -17,11 +40,12 @@ public class ConsoleReader implements Runnable{
                 System.out.println("Exiting...");
                 client.disconnect();
                 break;
-            } else if (message.startsWith("U ")){
-                String udpConetent = message.substring(2);
-                client.sendUDPMessage("MSG:" + client.getClientId() + ":" + udpConetent);
+            } else if (message.equals("U")) {
+                client.sendUDPMessage("MSG:" + client.getClientId() + ":" + asciiArtMessage);
             }
-            client.sendMessageTCP(message);
+            else {
+                client.sendMessageTCP(message);
+            }
         }
         keyboardScanner.close();
     }

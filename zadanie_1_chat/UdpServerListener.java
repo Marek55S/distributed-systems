@@ -8,8 +8,6 @@ public class UdpServerListener implements Runnable{
     private final Server server;
     private final DatagramSocket udpSocket;
 
-
-
     // when the connection is secured, client should send its clientId to the server
     public UdpServerListener(Server server, int portNumber) throws IOException {
         this.server = server;
@@ -28,6 +26,8 @@ public class UdpServerListener implements Runnable{
                 udpSocket.receive(receivePacket);
 
                 String message = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+
+                System.out.println("[DEBUG UDP] Serwer odebrał: " + message);
 
                 if (message.startsWith("INIT:")) {
                     int clientId = Integer.parseInt(message.split(":")[1]);

@@ -27,7 +27,7 @@ public class Client {
 
         String welcomeMsg = in.readLine();
         if(welcomeMsg != null && welcomeMsg.startsWith("ID:")){
-            this.clientId = Integer.parseInt(welcomeMsg.substring(3));
+            this.clientId = Integer.parseInt(welcomeMsg.substring(3).trim());
             System.out.println("Connected with server. Client ID: " + clientId);
         }
         this.udpSocket = new DatagramSocket();
