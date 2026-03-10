@@ -38,7 +38,7 @@ public class UdpServerListener implements Runnable{
                     String[] parts = message.split(":", 3);
                     int serverId = Integer.parseInt(parts[1]);
                     String messageData = parts[2];
-
+                    System.out.println("Received UDP message from client " + serverId);
                     server.broadcastUDPMessage(messageData, serverId, udpSocket);
                 }
             }

@@ -17,8 +17,12 @@ public class ConsoleReader implements Runnable{
                 System.out.println("Exiting...");
                 client.disconnect();
                 break;
+            } else if (message.startsWith("U ")){
+                String udpConetent = message.substring(2);
+                client.sendUDPMessage("MSG:" + client.getClientId() + ":" + udpConetent);
             }
             client.sendMessageTCP(message);
         }
+        keyboardScanner.close();
     }
 }
