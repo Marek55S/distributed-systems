@@ -1,28 +1,26 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
 public class Client {
+    public static final String multicastAddress = "230.0.0.1";
+    public static final int multicastPort = 4446;
+
     private final String serverAddress;
     private final int serverPort;
     private final Socket tcpSocket;
     private final BufferedReader in;
     private final PrintWriter out;
     private final ExecutorService executor = Executors.newCachedThreadPool();
-
-    private DatagramSocket udpSocket;
+    private final DatagramSocket udpSocket;
     private int clientId;
+    private MulticastSocket multicastSocket;
 
-    public static final String multicastAddress = "230.0.0.1";
-    public static final int multicastPort = 4446;
 
     public Client(String serverAddress, int serverPort) throws IOException {
         this.tcpSocket = new Socket(serverAddress, serverPort);
@@ -38,6 +36,18 @@ public class Client {
         }
         this.udpSocket = new DatagramSocket();
         sendUDPMessage("INIT:" + clientId);
+    }
+
+    public void start() throws IOException {
+        this.multicastSocket = new MulticastSocket(multicastPort);
+        SocketAddress group = new InetSocketAddress(InetAddress.getByName(multicastAddress), multicastPort);
+        NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+        multicastSocket.joinGroup(group, networkInterface);
+
+        executor.submit(new ClientTCPListener(this));
+        executor.submit(new ClientUDPListener(udpSocket));
+        executor.submit(new ConsoleReader(this));
+        executor.submit(new ClientMulticastListener(this,multicastSocket));
     }
 
     public void sendMessageTCP(String message){
@@ -95,20 +105,10 @@ public class Client {
         }
     }
 
-    public void start() throws IOException {
-        executor.submit(new ClientTCPListener(this));
-        executor.submit(new ClientUDPListener(udpSocket));
-        executor.submit(new ConsoleReader(this));
-        executor.submit(new ClientMulticastListener(this,multicastAddress,multicastPort));
-    }
-
     public BufferedReader getIn() {
         return in;
     }
 
-    public DatagramSocket getUdpSocket() {
-        return udpSocket;
-    }
 
     public int getClientId() {
         return clientId;

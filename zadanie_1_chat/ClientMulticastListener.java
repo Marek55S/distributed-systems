@@ -5,14 +5,9 @@ public class ClientMulticastListener implements Runnable{
     private final MulticastSocket multicastSocket;
     private final Client client;
 
-    public ClientMulticastListener(Client client,String multicastAddress, int portNumber) throws IOException {
+    public ClientMulticastListener(Client client,MulticastSocket multicastSocket)  {
         this.client = client;
-        this.multicastSocket = new MulticastSocket(portNumber);
-        InetAddress group = InetAddress.getByName(multicastAddress);
-
-        InetSocketAddress socketAddress = new InetSocketAddress(group, portNumber);
-        NetworkInterface networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-        multicastSocket.joinGroup(socketAddress, networkInterface);
+        this.multicastSocket = multicastSocket;
     }
 
     @Override

@@ -28,6 +28,39 @@ public class ServerTCPThread implements Runnable{
         out.println("ID: " + clientId);
     }
 
+    @Override
+    public void run()  {
+        try {
+            String message;
+            while ((message = in.readLine()) != null) {
+                System.out.println("Received from client " + clientId + ": " + message);
+                server.broadcastTCPMessage("Client " + clientId + ": " + message, clientId);
+            }
+        } catch (IOException e) {
+            System.out.println("Error in client " + clientId + ": " + e.getMessage());
+        }
+        finally {
+            System.out.println("Client " + clientId + " disconnected.");
+            server.removeClient(clientId);
+
+            try {
+                if (clientSocket != null && !clientSocket.isClosed()) {
+                    clientSocket.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Error closing client socket for client " + clientId + ": " + e.getMessage());
+            }
+        }
+    }
+
+    public void sendTCPMessage(String message) {
+        out.println(message);
+        if (out.checkError()) {
+            System.out.println("Failed to send message to client " + clientId);
+        }
+    }
+
+
     public void setUdpConnectionDetails(InetAddress address, int port) {
         this.udpAddress = address;
         this.udpPort = port;
@@ -45,36 +78,4 @@ public class ServerTCPThread implements Runnable{
         return clientId;
     }
 
-    @Override
-    public void run()  {
-        try {
-            String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Received from client " + clientId + ": " + message);
-                server.broadcastTCPMessage("Client " + clientId + ": " + message, clientId);
-            }
-        } catch (IOException e) {
-            System.out.println("Error in client " + clientId + ": " + e.getMessage());
-        }
-            finally {
-                System.out.println("Client " + clientId + " disconnected.");
-                server.removeClient(clientId);
-
-                try {
-                    if (clientSocket != null && !clientSocket.isClosed()) {
-                        clientSocket.close();
-                    }
-                } catch (IOException e) {
-                    System.out.println("Error closing client socket for client " + clientId + ": " + e.getMessage());
-                }
-            }
-    }
-
-
-    public void sendTCPMessage(String message) {
-        out.println(message);
-        if (out.checkError()) {
-            System.out.println("Failed to send message to client " + clientId);
-        }
-    }
 }

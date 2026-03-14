@@ -19,7 +19,7 @@ public class Server {
     public Server(){
     }
 
-    private void start(int portNumber) {
+    public void start(int portNumber) {
         try{
             this.isRunning = true;
             this.serverSocket = new ServerSocket(portNumber);
@@ -69,7 +69,7 @@ public class Server {
         executor.submit(tcpThread);
     }
 
-    public void registerClientUdp(int clientId, InetAddress address, int portNumber) throws IOException{
+    public void registerClientUdp(int clientId, InetAddress address, int portNumber) {
         ServerTCPThread client = clientsMap.get(clientId);
         if(client!=null){
             client.setUdpConnectionDetails(address, portNumber);
@@ -82,7 +82,7 @@ public class Server {
     
     public void broadcastTCPMessage(String message, int senderId){
         for(ServerTCPThread clientThread : clientsMap.values()){
-            if(clientThread.getClientId() != (int) senderId){
+            if(clientThread.getClientId() !=  senderId){
                 clientThread.sendTCPMessage(message);
             }
         }
