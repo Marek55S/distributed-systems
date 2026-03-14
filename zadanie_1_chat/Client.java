@@ -17,6 +17,8 @@ public class Client {
 
     private DatagramSocket udpSocket;
     private int clientId;
+    public static final String multicastAddress = "230.0.0.1";
+    public static final int multicastPort = 4446;
 
     public Client(String serverAddress, int serverPort) throws IOException {
         this.tcpSocket = new Socket(serverAddress, serverPort);
@@ -50,6 +52,17 @@ public class Client {
             udpSocket.send(packet);
         } catch (IOException e){
             System.out.println("Error sending UDP message: " + e.getMessage());
+        }
+    }
+
+    public void sendMulticastMessage(String message){
+        try{
+            byte[] buffer = message.getBytes();
+            InetAddress group = InetAddress.getByName(multicastAddress);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, multicastPort);
+            udpSocket.send(packet);
+        } catch (IOException e){
+            System.out.println("Error sending multicast message: " + e.getMessage());
         }
     }
 
@@ -89,6 +102,7 @@ public class Client {
             new Thread(new ClientTCPListener(client)).start();
             new Thread(new ClientUDPListener(client.getUdpSocket())).start();
             new Thread(new ConsoleReader(client)).start();
+            new Thread(new ClientMulticastListener(client,multicastAddress,multicastPort)).start();
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }

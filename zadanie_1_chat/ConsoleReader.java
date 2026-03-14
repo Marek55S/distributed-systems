@@ -27,6 +27,15 @@ public class ConsoleReader implements Runnable{
               (t^##_          ((__/(_____(______,'______(___) SSt
             """;
 
+    public static final String multicastMessage = """
+                       __n__n__
+                .------`-\\00/-'
+               /  ##  ## (oo)
+              / \\## __   ./
+                 |//YY \\|/
+            snd  |||   |||
+            """;
+
     public ConsoleReader(Client client){
         this.client = client;
         this.keyboardScanner = new Scanner(System.in);
@@ -42,6 +51,8 @@ public class ConsoleReader implements Runnable{
                 break;
             } else if (message.equals("U")) {
                 client.sendUDPMessage("MSG:" + client.getClientId() + ":" + asciiArtMessage);
+            }else if(message.equals("M")){
+                client.sendMulticastMessage("MSG:" + client.getClientId() + ":" + multicastMessage);
             }
             else {
                 client.sendMessageTCP(message);
