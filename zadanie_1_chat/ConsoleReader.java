@@ -50,9 +50,9 @@ public class ConsoleReader implements Runnable{
                 client.disconnect();
                 break;
             } else if (message.equals("U")) {
-                client.sendUDPMessage("MSG:" + client.getClientId() + ":" + asciiArtMessage);
+                client.sendUDPMessage("MSG:" + client.getClientId() + ":\n" + asciiArtMessage);
             }else if(message.equals("M")){
-                client.sendMulticastMessage("MSG:" + client.getClientId() + ":" + multicastMessage);
+                client.sendMulticastMessage("MSG:" + client.getClientId() + ":\n" + multicastMessage);
             }
             else {
                 client.sendMessageTCP(message);

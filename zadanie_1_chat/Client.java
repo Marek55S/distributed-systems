@@ -5,7 +5,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class Client {
@@ -14,9 +16,11 @@ public class Client {
     private final Socket tcpSocket;
     private final BufferedReader in;
     private final PrintWriter out;
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     private DatagramSocket udpSocket;
     private int clientId;
+
     public static final String multicastAddress = "230.0.0.1";
     public static final int multicastPort = 4446;
 
@@ -74,10 +78,28 @@ public class Client {
             if (udpSocket != null && !udpSocket.isClosed()) {
                 udpSocket.close();
             }
+            executor.shutdown();
+
+            if(!executor.awaitTermination(2, TimeUnit.SECONDS)){
+                System.out.println("Forcing shutdown of client threads...");
+                executor.shutdownNow();
+            }
+
             System.out.println("Connection closed");
+
         } catch (IOException e) {
             System.out.println("Error closing client socket: " + e.getMessage());
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
+    }
+
+    public void start() throws IOException {
+        executor.submit(new ClientTCPListener(this));
+        executor.submit(new ClientUDPListener(udpSocket));
+        executor.submit(new ConsoleReader(this));
+        executor.submit(new ClientMulticastListener(this,multicastAddress,multicastPort));
     }
 
     public BufferedReader getIn() {
@@ -99,10 +121,7 @@ public class Client {
 
         try {
             Client client = new Client(serverAddress, serverPort);
-            new Thread(new ClientTCPListener(client)).start();
-            new Thread(new ClientUDPListener(client.getUdpSocket())).start();
-            new Thread(new ConsoleReader(client)).start();
-            new Thread(new ClientMulticastListener(client,multicastAddress,multicastPort)).start();
+            client.start();
         } catch (IOException e) {
             System.out.println("Error connecting to server: " + e.getMessage());
         }

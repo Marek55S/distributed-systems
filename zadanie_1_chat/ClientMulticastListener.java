@@ -17,7 +17,7 @@ public class ClientMulticastListener implements Runnable{
 
     @Override
     public void run() {
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[1024];
         try{
             while(true){
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);

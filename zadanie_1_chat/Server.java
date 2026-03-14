@@ -1,30 +1,47 @@
 import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
     private final ConcurrentHashMap<Integer, ServerTCPThread> clientsMap = new ConcurrentHashMap<>();
-
     private final AtomicInteger clientIdGenerator = new AtomicInteger(1);
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    private volatile boolean isRunning=false;
+    private ServerSocket serverSocket;
 
 
     public Server(){
     }
 
-    private void startServer(int portNumber) throws IOException {
-        UdpServerListener udpListener = new UdpServerListener(this, portNumber);
-        new Thread(udpListener).start();
-        System.out.println("UDP listener started on port " + portNumber);
-
-        try (ServerSocket serverSocket = new ServerSocket(portNumber)){
+    private void start(int portNumber) {
+        try{
+            this.isRunning = true;
+            this.serverSocket = new ServerSocket(portNumber);
             System.out.println("Server is running on port " + portNumber);
-            while(true){
-                Socket clientSocket = serverSocket.accept();
-                addNewClient(clientSocket);
-            }
 
+            UdpServerListener udpListener = new UdpServerListener(this, portNumber);
+            executor.submit(udpListener);
+            System.out.println("UDP listener started on port " + portNumber);
+
+
+            while(this.isRunning){
+                try {
+                    Socket clientSocket = serverSocket.accept();
+                    addNewClient(clientSocket);
+                } catch (IOException e) {
+                    if (!isRunning) {
+                        System.out.println("Server socket stopped accepting new clients.");                    } else {
+                        break;
+                    }
+                    System.out.println("Error accepting client connection: " + e.getMessage());
+                }
+            }
         } catch (IOException e){
             System.out.println("Error in server: " + e.getMessage());
         }
@@ -49,7 +66,7 @@ public class Server {
         ServerTCPThread tcpThread = new ServerTCPThread(clientSocket, this, clientId);
         clientsMap.put(clientId, tcpThread);
         tcpThread.sendGreeting();
-        new Thread(tcpThread).start();
+        executor.submit(tcpThread);
     }
 
     public void registerClientUdp(int clientId, InetAddress address, int portNumber) throws IOException{
@@ -88,14 +105,32 @@ public class Server {
         }
     }
 
-    public static void main(String[] args){
+    public void stopServer() {
+        if(!isRunning) return;
+        isRunning = false;
+        System.out.println("Stopping server...");
+
         try{
-            Server server = new Server();
-            server.startServer(12345);
-        }
-        catch (IOException e){
-            System.out.println("Error starting server: " + e.getMessage());
+            if(serverSocket != null && !serverSocket.isClosed()){
+                serverSocket.close();
+            }
+
+            executor.shutdown();
+            if(!executor.awaitTermination(3, TimeUnit.SECONDS)){
+                System.out.println("Forcing shutdown of remaining tasks...");
+                executor.shutdownNow();
+            }
+            System.out.println("Server stopped.");
+        } catch (Exception e){
+            System.out.println("Error closing server socket: " + e.getMessage());
+            executor.shutdownNow();
         }
     }
 
+    public static void main(String[] args){
+        int portNumber = 12345;
+        Server server = new Server();
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stopServer));
+        server.start(portNumber);
+    }
 }
