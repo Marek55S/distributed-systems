@@ -1,0 +1,19 @@
+<!DOCTYPE>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health Data Analyzer - Results</title>
+</head>
+<body>
+    <h1>Analysis Results</h1>
+    {% if error_message %}
+        <h2 style="color: red;">{{ error_message }}</h2>
+        <a href="/">Go Back</a>
+    {% else %}
+        <p>Selected Country: <strong>{{ data.country }}</strong></p>
+        <p>{{ data.message }}</p>
+
+        <br>
+        <a href="/">Check another country</a>
+    {% endif %}
+</body>

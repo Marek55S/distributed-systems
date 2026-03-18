@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health Data Analyzer</title>
+</head>
+<body>
+    <h1>Hospital Capacity Analyzer</h1>
+
+    <form action="/analyze" method="post">
+
+        <label for="country">Enter Country Name (e.g., Italy, Germany, Japan):</label><br>
+        <input type="text" name="country" id="country" required>
+        <br><br>
+
+        <label for="api_token">API Access Token (type: password123):</label><br>
+        <input type="password" name="api_token" required>
+        <br><br>
+
+        <button type="submit">Run Analysis</button>
+    </form>
+</body>
+</html>

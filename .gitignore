@@ -2,6 +2,7 @@
 /.idea/
 out/
 /out/
+/__pycache__/
 
 .venv
 
