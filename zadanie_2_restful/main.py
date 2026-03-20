@@ -42,3 +42,26 @@ async def analyze_data(
     results = calculate_health_metrics(country, year, month, hist_data, wb_data, population)
 
     return templates.TemplateResponse("result.html",{"request": request, "data": results})
+
+# clean RESTful endpoint (if standard analyze_data with HTML response isnt right in this task)
+@app.post("/api/analyze")
+async def analaze_data_json(
+        country: str = Form(...),
+        year: str = Form(...),
+        month: str = Form(...),
+        api_token: str = Depends(verify_token)
+):
+    try:
+        country_info, hist_data, wb_data, population = await fetch_external_data(country)
+    except Exception as e:
+        if not isinstance(e, HTTPException):
+            raise HTTPException(status_code=500,detail=f"Internal or Network Error: {str(e)}")
+        raise e
+
+    results = calculate_health_metrics(country, year, month, hist_data, wb_data, population)
+
+    return {
+        "status": "success",
+        "message": "Data successfully analyzed",
+        "data": results
+    }
