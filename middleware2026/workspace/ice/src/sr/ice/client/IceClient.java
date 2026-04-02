@@ -2,6 +2,7 @@ package sr.ice.client;
 
 import Demo.A;
 import Demo.CalcPrx;
+import Demo.NoInput;
 import com.zeroc.Ice.*;
 
 import java.io.IOException;
@@ -33,6 +34,13 @@ public class IceClient {
 			//CalcPrx obj1 = CalcPrx.uncheckedCast(base1); //na czym polega różnica?
 			if (obj1 == null) throw new Error("Invalid proxy");
 
+			ObjectPrx base2 = communicator.propertyToProxy("Calc33.Proxy");
+			if (base2 == null){
+				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z");
+			}
+			CalcPrx obj2 = CalcPrx.checkedCast(base2);
+			if (obj2 == null) throw new Error("Invalid proxy for calc33");
+
 			CompletableFuture<Long> cfl = null;
 			String line = null;
 			java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
@@ -53,13 +61,38 @@ public class IceClient {
 							r = obj1.add(7000, 8000);
 							System.out.println("RESULT = " + r);
 							break;
+						case "add33":
+							r = obj2.add(100, 200);
+							System.out.println("RESULT = " + r);
+							break;
 						case "subtract":
 							r = obj1.subtract(7, 8);
 							System.out.println("RESULT = " + r);
 							break;
+						case "avg":
+							try {
+								r = (long) obj1.avg(new long[]{10, 20, 30});
+								System.out.println("RESULT = " + r);
+							}catch (NoInput ex){
+								System.out.println("Exception: " + ex.message);
+							}
+							break;
+						case "avg empty":
+							try {
+								r = (long) obj1.avg(new long[]{});
+								System.out.println("RESULT = " + r);
+							}catch (NoInput ex){
+								System.out.println("Exception: " + ex.message);
+							}
+							break;
 						case "op":
 							a = new A((short) 11, 22, 33.0f, "ala ma kota");
 							obj1.op(a, (short) 44);
+							System.out.println("DONE");
+							break;
+						case "op33":
+							a = new A((short) 11, 22, 33.0f, "ala ma kota");
+							obj2.op(a, (short) 44);
 							System.out.println("DONE");
 							break;
 						case "op2":

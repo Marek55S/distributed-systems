@@ -6,7 +6,9 @@ module Demo
 {
   enum operation { MIN, MAX, AVG };
   
-  exception NoInput {};
+  exception NoInput {
+    string message;
+  };
 
   struct A
   {
@@ -14,13 +16,16 @@ module Demo
     long b;
     float c;
     string d;
-  }
+  };
+
+  sequence<long> seqLong;
 
   interface Calc
   {
     long add(int a, int b);
     long subtract(int a, int b);
     void op(A a1, short b1); //załóżmy, że to też jest operacja arytmetyczna ;)
+    double avg(seqLong numbers) throws NoInput;
   };
 
 };
