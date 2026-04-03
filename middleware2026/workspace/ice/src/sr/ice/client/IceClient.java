@@ -27,7 +27,9 @@ public class IceClient {
                 // 2. Uzyskanie referencji obiektu - to samo co powyżej, ale mniej ładnie
                 System.out.println("(using a hard-coded configuration)");
                 base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z włącza możliwość kompresji wiadomości
-            }
+//				base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z"); //opcja -z włącza możliwość kompresji wiadomości
+
+			}
 
 			// 3. Rzutowanie, zawężanie (do typu Calc)
 			CalcPrx obj1 = CalcPrx.checkedCast(base1);
@@ -36,6 +38,7 @@ public class IceClient {
 
 			ObjectPrx base2 = communicator.propertyToProxy("Calc33.Proxy");
 			if (base2 == null){
+//				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z");
 				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z");
 			}
 			CalcPrx obj2 = CalcPrx.checkedCast(base2);
@@ -116,7 +119,7 @@ public class IceClient {
 						/* PONIŻEJ WYWOŁANIA REALIZOWANE W TRYBIE ASYNCHRONICZNYM (completable future) */
 
 						case "add-asyn1":
-							obj1.addAsync(7000, 8000).whenComplete((result, ex) -> System.out.println("RESULT (asyn) = " + result));
+							obj1.addAsync(8000, 8000).whenComplete((result, ex) -> System.out.println("RESULT (asyn) = " + result));
 							break;
 						case "add-asyn2-req":  // 1. wysłanie żądania
 							cfl = obj1.addAsync(7000, 8000);
