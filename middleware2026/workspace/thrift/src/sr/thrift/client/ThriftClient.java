@@ -46,9 +46,9 @@ public class ThriftClient
 			{
 				transport = new TSocket(host, 9080);
 
-				//protocol = new TBinaryProtocol(transport);
-				//protocol = new TJSONProtocol(transport);
-				protocol = new TCompactProtocol(transport);
+				protocol = new TBinaryProtocol(transport);
+//				protocol = new TJSONProtocol(transport);
+				// protocol = new TCompactProtocol(transport);
 
 				synCalc1 = new Calculator.Client(protocol);
 				synAdvCalc1 = new AdvancedCalculator.Client(protocol); //wskazuje na ten sam zdalny obiekt - dlaczego?
@@ -108,6 +108,10 @@ public class ThriftClient
 					} else if (line.equals("op2")) {
 						double res = synAdvCalc1.op(OperationType.AVG, new HashSet<Double>());
 						System.out.println("op(AVG, ()) returned " + res);
+					} else if (line.equals("median")){
+						java.util.List<Integer> myNumbers = java.util.Arrays.asList(10, 20, 30, 5, 100, 40);
+						double result = synAdvCalc1.calculateMedian(myNumbers);
+						System.out.println("calculateMedian(" + myNumbers + ") returned " + result);
 					} else if (line.equals("x")) {
 						// Nothing to do
 					} else {

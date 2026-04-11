@@ -26,8 +26,8 @@ public class IceClient {
             if(base1 == null) { //powyższa opcja się nie uda, gdy nie był wskazany plik konfiguracyjny (--Ice.Config=client.config)
                 // 2. Uzyskanie referencji obiektu - to samo co powyżej, ale mniej ładnie
                 System.out.println("(using a hard-coded configuration)");
-                base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z włącza możliwość kompresji wiadomości
-//				base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z"); //opcja -z włącza możliwość kompresji wiadomości
+//                base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z włącza możliwość kompresji wiadomości
+				base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z"); //opcja -z włącza możliwość kompresji wiadomości
 
 			}
 
@@ -38,8 +38,8 @@ public class IceClient {
 
 			ObjectPrx base2 = communicator.propertyToProxy("Calc33.Proxy");
 			if (base2 == null){
-//				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z");
-				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z");
+				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10010 -z : udp -h 127.0.0.2 -p 10010 -z");
+//				base2 = communicator.stringToProxy("calc/calc33:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z");
 			}
 			CalcPrx obj2 = CalcPrx.checkedCast(base2);
 			if (obj2 == null) throw new Error("Invalid proxy for calc33");

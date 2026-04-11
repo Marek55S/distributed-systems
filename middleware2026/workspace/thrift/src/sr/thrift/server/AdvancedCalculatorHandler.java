@@ -59,5 +59,22 @@ public class AdvancedCalculatorHandler implements AdvancedCalculator.Iface {
 		return 0;
 	}
 
+	@Override
+	public double calculateMedian(java.util.List<Integer> numbers) throws sr.gen.thrift.InvalidArguments, TException {
+		System.out.println("AdvCalcHandler#" + id + " calculateMedian() with " + numbers.size() + " arguments");
+
+		if(numbers.isEmpty()) {
+			throw new InvalidArguments(0, "no data");
+		}
+
+		java.util.Collections.sort(numbers);
+		int n = numbers.size();
+		if(n % 2 == 1) {
+			return numbers.get(n/2);
+		} else {
+			return (numbers.get(n/2-1) + numbers.get(n/2))/2.0;
+		}
+	}
+
 }
 

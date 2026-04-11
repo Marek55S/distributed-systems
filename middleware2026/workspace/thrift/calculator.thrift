@@ -41,5 +41,6 @@ service Calculator {
     
  
 service AdvancedCalculator extends Calculator {
-   double op(1:OperationType type, 2: set<double> val) throws (1: InvalidArguments ex), 
+   double op(1:OperationType type, 2: set<double> val) throws (1: InvalidArguments ex),
+   double calculateMedian(1: list<i32> numbers) throws (1: InvalidArguments ex),
 }
