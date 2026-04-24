@@ -1,20 +1,27 @@
+# Ignore IntelliJ IDEA project files
 .idea/
-/.idea/
-out/
-/out/
-/__pycache__/
-
-.venv
-
-.python-version
-*.lock
-
 *.iml
 
-# Build output directories
+# Ignore build outputs
 out/
+target/
+build/
 
-# Middleware2026 specific ignores
+# Ignore Python virtual environments
+.venv/
+
+# Ignore Python version files
+.python-version
+
+# Ignore lock files
+*.lock
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore generated files from gRPC, Thrift, Ice, and serialization
 middleware2026/workspace/grpc/gen/
 middleware2026/workspace/grpc/target/
 middleware2026/workspace/ice/generated/
@@ -24,25 +31,16 @@ middleware2026/workspace/ice/target/lib/
 middleware2026/workspace/serialization/gen/
 middleware2026/workspace/thrift/gen-java/
 
-# Exclude compiled Java class files
+# Ignore Maven and Gradle build artifacts
 *.class
+*.jar
+*.war
+*.ear
+*.pom
+*.log
 
-# Exclude Maven and Gradle build directories
-target/
-build/
-
-# Exclude generated source files
-**/generated-sources/
-
-# Exclude IntelliJ IDEA output directories
-out/
-
-# Exclude Python bytecode files
-*.pyc
-*.pyo
-
-# Exclude other generated files
-middleware2026/workspace/grpc/gen/
-middleware2026/workspace/ice/generated/
-middleware2026/workspace/serialization/gen/
-middleware2026/workspace/thrift/gen-java/
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+.DS_Store
