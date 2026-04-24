@@ -1,0 +1,33 @@
+<!DOCTYPE>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Covid Pandemic Analysis</title>
+</head>
+<body>
+    <h1>Analysis Results</h1>
+    {% if error_message %}
+        <h2 style="color: red;">{{ error_message }}</h2>
+        <a href="/">Go back and try again</a>
+
+    {% else %}
+        <h2>Country: {{ data.country }}</h2>
+        <h3>Analyzed Period: {{ data.period }}</h3>
+
+        <p>In this specific month, we observed:</p>
+        <ul>
+            <li><strong>New Cases:</strong> {{ data.new_cases }}</li>
+            <li><strong>New Deaths:</strong> {{ data.new_deaths }}</li>
+            <li><strong>Mortality Rate (CFR):</strong> {{ data.cfr }}%</li>
+        </ul>
+
+        <h3>Hospital Infrastructure Capacity</h3>
+        <p>Based on World Bank data, {{ data.country }} has an estimated total of <strong>{{ data.total_beds }}</strong> hospital beds.</p>
+
+        <p><strong>Hospital Load Index: {{ data.hospital_load }}</strong></p>
+        <p><em>(This means that for every single hospital bed in the country, there were {{ data.hospital_load }} newly infected people during this month.)</em></p>
+
+        <br><hr>
+        <a href="/">Run another analysis</a>
+    {% endif %}
+</body>
