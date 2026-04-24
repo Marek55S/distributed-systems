@@ -10,3 +10,39 @@ out/
 *.lock
 
 *.iml
+
+# Build output directories
+out/
+
+# Middleware2026 specific ignores
+middleware2026/workspace/grpc/gen/
+middleware2026/workspace/grpc/target/
+middleware2026/workspace/ice/generated/
+middleware2026/workspace/ice/target/classes/
+middleware2026/workspace/ice/target/generated-sources/
+middleware2026/workspace/ice/target/lib/
+middleware2026/workspace/serialization/gen/
+middleware2026/workspace/thrift/gen-java/
+
+# Exclude compiled Java class files
+*.class
+
+# Exclude Maven and Gradle build directories
+target/
+build/
+
+# Exclude generated source files
+**/generated-sources/
+
+# Exclude IntelliJ IDEA output directories
+out/
+
+# Exclude Python bytecode files
+*.pyc
+*.pyo
+
+# Exclude other generated files
+middleware2026/workspace/grpc/gen/
+middleware2026/workspace/ice/generated/
+middleware2026/workspace/serialization/gen/
+middleware2026/workspace/thrift/gen-java/
