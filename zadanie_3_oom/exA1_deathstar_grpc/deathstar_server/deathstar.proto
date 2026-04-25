@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package deathstar;
+
+option java_multiple_files = true;
+option java_package = "deathstar.grpc";
+
+message Empty {}
+
+enum DeviceType {
+  UNKNOWN_TYPE = 0;
+  WEAPON_PLANET_LASER = 1;
+  WEAPON_DEFENSIVE_LASERS = 2;
+  INTERNAL_BLAST_DOOR = 3;
+  HANGAR_BLAST_DOOR = 4;
+  DEVICE_SCANNER = 5;
+  LIFE_FORM_SCANNER = 6;
+}
+
+enum DeviceStatus {
+  UNKNOWN_STATUS = 0;
+  OPERATIONAL = 1;
+  MAINTENANCE = 2;
+  DESTROYED = 3;
+}
+
+message DeviceInfo {
+  string id = 1;
+  string name = 2;
+  string sector = 3;
+  DeviceType type = 4;
+  DeviceStatus status = 5;
+}
+
+message DeviceList {
+  repeated DeviceInfo devices = 1;
+}
+
+enum DoorAction {
+  OPEN = 0;
+  CLOSE = 1;
+  LOCK_OVERRIDE = 2;
+}
+
+message Coordinates {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message WeaponCommand {
+  oneof command {
+    Coordinates fire_defensive_lasers = 1;
+    int32 planet_laser_power_percent = 2;
+  }
+}
+
+message ChangeStateRequest {
+  string device_id = 1;
+  oneof action {
+    DoorAction door_action = 2;
+    WeaponCommand weapon_command = 3;
+    bool run_diagnostic = 4;
+  }
+}
+
+message ActionResponse {
+  bool success = 1;
+  string message = 2;
+  int32 error_code = 3;
+}
+
+message ScanRequest {
+  string scanner_id = 1;
+  string target_sector = 2;
+}
+
+message LifeFormDetails {
+  string species = 1;
+  int32 count = 2;
+  bool is_hostile = 3;
+}
+
+message ScannedDeviceDetails {
+  string object_class = 1;
+  bool shields_active = 2;
+}
+
+message ScanResult {
+  oneof result_type {
+    LifeFormDetails life_form = 1;
+    ScannedDeviceDetails ship_or_device = 2;
+  }
+}
+
+message ScanResponse {
+  repeated ScanResult detected_objects = 1;
+}
+
+service DeathStarManagement {
+  rpc ListDevices(Empty) returns (DeviceList);
+  rpc ChangeDeviceState(ChangeStateRequest) returns (ActionResponse);
+  rpc RunScanner(ScanRequest) returns (ScanResponse);
+}
