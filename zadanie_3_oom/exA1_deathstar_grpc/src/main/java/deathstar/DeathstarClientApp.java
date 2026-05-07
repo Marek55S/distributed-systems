@@ -98,7 +98,7 @@ public class DeathstarClientApp {
                             requestBuilder.setDoorAction(DoorAction.forNumber(actionIndex));
 
                         } else if (type == DeviceType.WEAPON_PLANET_LASER) {
-                            System.out.print("Enter Superlaser power level (0-100%): ");
+                            System.out.print("Enter Planetlaser power level (0-100%): ");
                             int power = Integer.parseInt(scanner.nextLine());
                             WeaponCommand weaponCmd = WeaponCommand.newBuilder().setPlanetLaserPowerPercent(power).build();
                             requestBuilder.setWeaponCommand(weaponCmd);
