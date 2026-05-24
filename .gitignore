@@ -44,3 +44,5 @@ middleware2026/workspace/thrift/gen-java/
 *.swp
 *.swo
 .DS_Store
+
+.pytest_cache/

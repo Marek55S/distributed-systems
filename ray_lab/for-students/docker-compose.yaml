@@ -10,6 +10,7 @@ services:
 
     volumes:
       - ./notebook:/home/ray/work
+      - ./homework_tier_2:/home/ray/homework_tier_2
 
     working_dir: /home/ray/work
 
@@ -26,6 +27,7 @@ services:
       matplotlib
       scikit-learn
       requests
+      pytest
       &&
       jupyter lab
       --ip=0.0.0.0
