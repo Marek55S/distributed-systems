@@ -1,0 +1,34 @@
+services:
+  ray-head:
+    image: rayproject/ray:2.55.1-py310
+    container_name: ray-head
+    shm_size: "2gb"
+    ports:
+      - "8265:8265"      # dashboard
+      - "10001:10001"    # ray client
+    volumes:
+      - .:/home/ray/app
+    working_dir: /home/ray/app
+    environment:
+      - PYTHONPATH=/home/ray/app
+    command: >
+      ray start --head
+      --port=6379
+      --dashboard-host=0.0.0.0
+      --ray-client-server-port=10001
+      --num-cpus=2
+      --block
+
+  ray-worker:
+    image: rayproject/ray:2.55.1-py310
+    shm_size: "2gb"
+    depends_on:
+      - ray-head
+    volumes:
+      - .:/home/ray/app
+    working_dir: /home/ray/app
+    environment:
+      - PYTHONPATH=/home/ray/app
+    command: >
+      bash -lc "sleep 5 && ray start --address=ray-head:6379 --num-cpus=2 --block"
+    restart: on-failure
