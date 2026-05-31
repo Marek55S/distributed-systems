@@ -6,7 +6,6 @@ CONTENT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 
 if __name__ == "__main__":
-    # podłącz do JUŻ DZIAŁAJĄCEGO klastra (a nie lokalny Ray)
     ray.init(address="auto")
 
     print("=== Ray cluster nodes ===")

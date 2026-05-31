@@ -175,8 +175,6 @@ class NameNode:
         for node_id in dead:
             del self.data_nodes[node_id]
 
-        # reconcile: aktor mógł zostać auto-zrestartowany (max_restarts) i
-        # wrócić z pustym self.chunks; metadane mówią, że ma chunk, a on go nie ma.
         live_chunks_per_node = {}
         for node_id, node in self.data_nodes.items():
             try:
