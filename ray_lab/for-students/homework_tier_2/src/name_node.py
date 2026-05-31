@@ -37,27 +37,33 @@ class NameNode:
                 continue                
         raise RuntimeError(f"Chunk {chunk_id} is unavailable (all replicas failed)")
 
+    def _write_chunk(self, chunk_id, data, replicas):
+        ray.get([self.data_nodes[n].store.remote(chunk_id, data)
+                 for n in replicas if n in self.data_nodes])
+        self.chunk_locations[chunk_id] = replicas
+
+    def _delete_chunk(self, chunk_id):
+        for node_id in self.chunk_locations.get(chunk_id, []):
+            node = self.data_nodes.get(node_id)
+            if node is None:
+                continue
+            try:
+                ray.get(node.delete.remote(chunk_id))
+            except RayActorError:
+                continue
+        self.chunk_locations.pop(chunk_id, None)
+
     def _write(self, name, content):
         chunk_ids = []
         for idx, chunk_data in enumerate(self._split(content)):
             chunk_id = f"{name}-{idx}"
-            replicas = self._pick_replicas(idx)
-            ray.get([self.data_nodes[n].store.remote(chunk_id, chunk_data) for n in replicas])
-            self.chunk_locations[chunk_id] = replicas
+            self._write_chunk(chunk_id, chunk_data, self._pick_replicas(idx))
             chunk_ids.append(chunk_id)
         self.artifacts[name] = chunk_ids
 
     def _remove_chunks(self, name):
         for chunk_id in self.artifacts[name]:
-            for node_id in self.chunk_locations[chunk_id]:
-                node = self.data_nodes.get(node_id)
-                if node is None:
-                    continue
-                try:
-                    ray.get(node.delete.remote(chunk_id))
-                except RayActorError:
-                    continue
-            del self.chunk_locations[chunk_id]
+            self._delete_chunk(chunk_id)
 
     def upload(self, name, content):
         if name in self.artifacts:
@@ -68,9 +74,37 @@ class NameNode:
     def update(self, name, content):
         if name not in self.artifacts:
             raise KeyError(f"Artifact '{name}' does not exist (use upload)")
-        self._remove_chunks(name)
-        self._write(name, content)
-        return {"artifact": name, "num_chunks": len(self.artifacts[name])}
+
+        new_chunks = self._split(content)
+        old_chunk_ids = list(self.artifacts[name])
+        new_chunk_ids = []
+        stats = {"unchanged": 0, "changed": 0, "added": 0, "removed": 0}
+
+        for idx, new_data in enumerate(new_chunks):
+            chunk_id = f"{name}-{idx}"
+            new_chunk_ids.append(chunk_id)
+
+            if idx < len(old_chunk_ids):
+                try:
+                    old_data = self._read_chunk(chunk_id)
+                except RuntimeError:
+                    old_data = None
+                if old_data == new_data:
+                    stats["unchanged"] += 1
+                    continue
+                replicas = self.chunk_locations.get(chunk_id) or self._pick_replicas(idx)
+                self._write_chunk(chunk_id, new_data, replicas)
+                stats["changed"] += 1
+            else:
+                self._write_chunk(chunk_id, new_data, self._pick_replicas(idx))
+                stats["added"] += 1
+
+        for old_idx in range(len(new_chunks), len(old_chunk_ids)):
+            self._delete_chunk(old_chunk_ids[old_idx])
+            stats["removed"] += 1
+
+        self.artifacts[name] = new_chunk_ids
+        return {"artifact": name, "num_chunks": len(new_chunk_ids), **stats}
 
     def delete(self, name):
         if name not in self.artifacts:
@@ -115,6 +149,13 @@ class NameNode:
         ray.kill(self.data_nodes[node_id])
         return {"killed": node_id}
 
+    def crash_node(self, node_id):
+        try:
+            ray.get(self.data_nodes[node_id].crash.remote())
+        except RayActorError:
+            pass
+        return {"crashed": node_id}
+
     def add_node(self):
         new_id = (max(self.data_nodes) + 1) if self.data_nodes else 0
         self.data_nodes[new_id] = DataNode.remote(new_id)
@@ -134,24 +175,35 @@ class NameNode:
         for node_id in dead:
             del self.data_nodes[node_id]
 
+        # reconcile: aktor mógł zostać auto-zrestartowany (max_restarts) i
+        # wrócić z pustym self.chunks; metadane mówią, że ma chunk, a on go nie ma.
+        live_chunks_per_node = {}
+        for node_id, node in self.data_nodes.items():
+            try:
+                live_chunks_per_node[node_id] = set(ray.get(node.list_chunks.remote()))
+            except RayActorError:
+                live_chunks_per_node[node_id] = set()
+
         re_replicated = []
         lost = []
         for chunk_id, locations in self.chunk_locations.items():
-            live = [n for n in locations if n in self.data_nodes]
+            live = [n for n in locations
+                    if n in self.data_nodes and chunk_id in live_chunks_per_node[n]]
             self.chunk_locations[chunk_id] = live
             if not live:
-                lost.append(chunk_id)        
+                lost.append(chunk_id)
                 continue
             while len(self.chunk_locations[chunk_id]) < self.replication:
                 candidates = [n for n in self.data_nodes
                               if n not in self.chunk_locations[chunk_id]]
                 if not candidates:
-                    break                     
+                    break
                 source = self.chunk_locations[chunk_id][0]
                 data = ray.get(self.data_nodes[source].get.remote(chunk_id))
                 target = candidates[0]
                 ray.get(self.data_nodes[target].store.remote(chunk_id, data))
                 self.chunk_locations[chunk_id].append(target)
+                live_chunks_per_node[target].add(chunk_id)
                 re_replicated.append((chunk_id, target))
         return {"dead_nodes": dead, "re_replicated": re_replicated, "lost": lost}
 

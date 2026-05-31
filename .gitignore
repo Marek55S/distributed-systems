@@ -46,3 +46,7 @@ middleware2026/workspace/thrift/gen-java/
 .DS_Store
 
 .pytest_cache/
+
+apache-zookeeper-3.8.4-bin/
+
+.claude/
