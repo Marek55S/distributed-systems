@@ -49,4 +49,9 @@ middleware2026/workspace/thrift/gen-java/
 
 apache-zookeeper-3.8.4-bin/
 
+# ZooKeeper dane runtime (zachowujemy pliki myid, ignorujemy snapshoty/epoki)
+lab_zookeeper/data/*/version-2/
+lab_zookeeper/data/*/currentEpoch
+lab_zookeeper/data/*/acceptedEpoch
+
 .claude/
