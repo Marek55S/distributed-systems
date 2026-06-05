@@ -17,7 +17,7 @@ if __name__ == "__main__":
     nn = NameNode.remote(num_data_nodes=4, replication=2, chunk_size=10)
     print("\nupload:", ray.get(nn.upload.remote("art-1", CONTENT)))
 
-    print("\n=== gdzie siedzą DataNode'y (fizyczne węzły klastra) ===")
+    print("\n=== where are DataNodes ===")
     for nid, loc in ray.get(nn.where_are_nodes.remote()).items():
         print(f"  DataNode {nid} -> ray_node={loc['ray_node']} host={loc['host']}")
 
